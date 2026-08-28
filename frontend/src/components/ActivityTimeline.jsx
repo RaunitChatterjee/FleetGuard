@@ -36,6 +36,7 @@ export function ActivityTimeline({ alerts, limit = 8 }) {
       {recent.map((alert, i) => (
         <div
           key={alert.id}
+          className="row-hoverable"
           style={{
             display: 'flex',
             gap: 12,

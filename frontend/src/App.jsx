@@ -136,18 +136,13 @@ function OverviewTab({
 
   return (
     <>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-          gap: 12,
-        }}
-      >
+      <div className="grid-stats">
         <StatCard label="Fleet Devices" value={s.total_devices ?? '—'} icon={Truck} accent="neutral" />
         <StatCard label="Total Alerts" value={s.total_alerts ?? '—'} icon={ShieldAlert} accent="neutral" />
         <StatCard label="Critical" value={s.critical_alerts ?? '—'} icon={AlertTriangle} accent="critical" />
         <StatCard label="High" value={s.high_alerts ?? '—'} icon={Radio} accent="amber" />
-        <StatCard label="Medium / Low" value={(s.medium_alerts ?? 0) + (s.low_alerts ?? 0)} icon={ShieldCheck} accent="neutral" />
+        <StatCard label="Medium" value={s.medium_alerts ?? '—'} icon={ShieldCheck} accent="neutral" />
+        <StatCard label="Low" value={s.low_alerts ?? '—'} icon={ShieldCheck} accent="neutral" />
         <StatCard
           label="Unacknowledged"
           value={s.unacknowledged_alerts ?? '—'}
@@ -156,7 +151,7 @@ function OverviewTab({
         />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 18, minHeight: 320 }}>
+      <div className="grid-overview-row" style={{ minHeight: 320 }}>
         <Panel eyebrow="Live Fleet" title="Vehicle Telemetry Grid" style={{ minHeight: 320 }}>
           <FleetGrid
             devices={devices.data || []}
@@ -179,7 +174,7 @@ function OverviewTab({
         </Panel>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: 18 }}>
+      <div className="grid-overview-row grid-overview-row--reverse">
         <Panel eyebrow="Distribution" title="Alerts by Attack Type">
           <div style={{ padding: 18 }}>
             {alerts.loading && !alerts.data ? (
@@ -255,7 +250,7 @@ function AlertsTab({ alerts, onAcknowledge }) {
 
 function FleetTab({ devices, alertsByDevice, selectedDeviceId, onSelectDevice, deviceTelemetry, onAcknowledge }) {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '340px 1fr', gap: 18, flex: 1, minHeight: 0 }}>
+    <div className="grid-fleet">
       <Panel eyebrow="Registered Devices" title="Fleet Roster" bodyStyle={{ overflowY: 'auto' }}>
         {devices.loading && !devices.data ? (
           <LoadingView />

@@ -40,7 +40,7 @@ export function DeviceDetail({ deviceId, telemetry, loading, deviceAlerts, onAck
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 18, padding: 18 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+      <div className="grid-mini-stats">
         <MiniStat label="Speed" value={`${latest.speed_kmh.toFixed(1)} km/h`} />
         <MiniStat label="Ignition" value={latest.ignition_status.toUpperCase()} />
         <MiniStat label="Firmware" value={latest.firmware_version} />
@@ -97,10 +97,16 @@ function MiniStat({ label, value }) {
         border: '1px solid var(--border-hairline)',
         borderRadius: 'var(--radius-sm)',
         padding: '10px 12px',
+        minWidth: 0,
       }}
     >
       <div className="eyebrow" style={{ marginBottom: 4 }}>{label}</div>
-      <div className="mono" style={{ fontSize: 14, color: 'var(--text-primary)' }}>{value}</div>
+      <div
+        className="mono"
+        style={{ fontSize: 14, color: 'var(--text-primary)', overflowWrap: 'break-word' }}
+      >
+        {value}
+      </div>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Check, Loader2 } from 'lucide-react';
+import { Check, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 import { SeverityTag, AckTag } from './Tags';
 import { EmptyView } from './StateViews';
 
@@ -10,6 +10,8 @@ const ATTACK_LABELS = {
   unauthorized_device: 'Unauthorized Device',
   firmware_regression: 'Firmware Regression',
 };
+
+const DETAILS_TRUNCATE_LENGTH = 84;
 
 function formatTimestamp(ts) {
   try {
@@ -29,6 +31,8 @@ function formatTimestamp(ts) {
 
 export function AlertsTable({ alerts, onAcknowledge, filter = 'all', compact = false }) {
   const [pendingIds, setPendingIds] = useState(new Set());
+  const [recentlyAcked, setRecentlyAcked] = useState(new Set());
+  const [expandedIds, setExpandedIds] = useState(new Set());
 
   if (!alerts || alerts.length === 0) {
     return <EmptyView label="No alerts recorded" hint="The threat feed populates as detections fire on incoming telemetry." />;
@@ -44,6 +48,14 @@ export function AlertsTable({ alerts, onAcknowledge, filter = 'all', compact = f
     setPendingIds((prev) => new Set(prev).add(id));
     try {
       await onAcknowledge(id);
+      setRecentlyAcked((prev) => new Set(prev).add(id));
+      setTimeout(() => {
+        setRecentlyAcked((prev) => {
+          const next = new Set(prev);
+          next.delete(id);
+          return next;
+        });
+      }, 900);
     } finally {
       setPendingIds((prev) => {
         const next = new Set(prev);
@@ -51,6 +63,15 @@ export function AlertsTable({ alerts, onAcknowledge, filter = 'all', compact = f
         return next;
       });
     }
+  };
+
+  const toggleExpanded = (id) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   };
 
   return (
@@ -66,17 +87,43 @@ export function AlertsTable({ alerts, onAcknowledge, filter = 'all', compact = f
         <tbody>
           {filtered.map((alert) => {
             const isPending = pendingIds.has(alert.id);
+            const justAcked = recentlyAcked.has(alert.id);
+            const hierarchySeverity =
+              alert.severity === 'critical' || alert.severity === 'high' ? alert.severity : undefined;
+            const details = alert.details || '';
+            const isLong = details.length > DETAILS_TRUNCATE_LENGTH;
+            const isExpanded = expandedIds.has(alert.id);
+
             return (
-              <tr key={alert.id} style={{ borderTop: '1px solid var(--border-hairline)' }}>
+              <tr
+                key={alert.id}
+                className={`row-interactive${justAcked ? ' ack-flash' : ''}`}
+                data-severity={hierarchySeverity}
+                style={{ borderTop: '1px solid var(--border-hairline)' }}
+              >
                 <td style={td}><SeverityTag severity={alert.severity} /></td>
                 <td style={{ ...td, ...tdMono }}>{alert.device_id}</td>
-                <td style={td}>
+                <td style={{ ...td, maxWidth: 320 }}>
                   <div style={{ color: 'var(--text-primary)' }}>
                     {ATTACK_LABELS[alert.alert_type] || alert.alert_type}
                   </div>
-                  {!compact && (
+                  {!compact && details && (
                     <div style={{ fontSize: 11.5, color: 'var(--text-tertiary)', marginTop: 2 }}>
-                      {alert.details}
+                      <span className={isExpanded || !isLong ? undefined : 'truncate-2'}>
+                        {details}
+                      </span>
+                      {isLong && (
+                        <button
+                          onClick={() => toggleExpanded(alert.id)}
+                          style={expandBtn}
+                        >
+                          {isExpanded ? (
+                            <>Show less <ChevronUp size={10} /></>
+                          ) : (
+                            <>Show more <ChevronDown size={10} /></>
+                          )}
+                        </button>
+                      )}
                     </div>
                   )}
                 </td>
@@ -150,4 +197,18 @@ const ackBtn = {
   borderRadius: 'var(--radius-sm)',
   cursor: 'pointer',
   whiteSpace: 'nowrap',
+};
+
+const expandBtn = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 3,
+  background: 'transparent',
+  border: 'none',
+  color: 'var(--amber)',
+  fontFamily: 'var(--font-mono)',
+  fontSize: 10.5,
+  letterSpacing: '0.03em',
+  padding: '3px 0 0',
+  cursor: 'pointer',
 };

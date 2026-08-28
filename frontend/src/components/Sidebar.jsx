@@ -29,6 +29,7 @@ export function Sidebar({ active, onChange, criticalCount }) {
             key={item.id}
             onClick={() => onChange(item.id)}
             aria-current={isActive}
+            className="nav-item"
             style={{
               width: 58,
               display: 'flex',
@@ -36,13 +37,12 @@ export function Sidebar({ active, onChange, criticalCount }) {
               alignItems: 'center',
               gap: 5,
               padding: '10px 0',
-              background: isActive ? 'var(--amber-glow)' : 'transparent',
+              background: isActive ? 'var(--amber-glow)' : undefined,
               border: 'none',
               borderLeft: isActive ? '2px solid var(--amber)' : '2px solid transparent',
               color: isActive ? 'var(--amber)' : 'var(--text-tertiary)',
               cursor: 'pointer',
               position: 'relative',
-              transition: 'color 0.15s var(--ease-console), background 0.15s var(--ease-console)',
             }}
           >
             <Icon size={18} strokeWidth={2} />

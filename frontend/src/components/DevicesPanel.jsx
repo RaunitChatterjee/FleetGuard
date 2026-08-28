@@ -1,6 +1,21 @@
 import { DeviceStatusDot } from './Tags';
 import { EmptyView } from './StateViews';
 
+const SEVERITY_ORDER = ['critical', 'high', 'medium', 'low'];
+const SEVERITY_BADGE = {
+  critical: { color: 'var(--sev-critical)', glow: 'var(--sev-critical-glow)' },
+  high: { color: 'var(--sev-high)', glow: 'var(--sev-high-glow)' },
+  medium: { color: 'var(--sev-medium)', glow: 'var(--sev-medium-glow)' },
+  low: { color: 'var(--sev-low)', glow: 'var(--sev-low-glow)' },
+};
+
+function highestSeverity(alerts) {
+  for (const sev of SEVERITY_ORDER) {
+    if (alerts.some((a) => a.severity === sev)) return sev;
+  }
+  return null;
+}
+
 function isStale(lastSeen) {
   if (!lastSeen) return true;
   const d = new Date(lastSeen.endsWith('Z') ? lastSeen : `${lastSeen}Z`);
@@ -30,6 +45,8 @@ export function DevicesPanel({ devices, alertsByDevice, selectedDeviceId, onSele
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       {devices.map((device, i) => {
         const openAlerts = (alertsByDevice[device.device_id] || []).filter((a) => !a.acknowledged);
+        const worstSeverity = highestSeverity(openAlerts);
+        const badge = worstSeverity ? SEVERITY_BADGE[worstSeverity] : null;
         const stale = isStale(device.last_seen);
         const isSelected = selectedDeviceId === device.device_id;
 
@@ -37,6 +54,8 @@ export function DevicesPanel({ devices, alertsByDevice, selectedDeviceId, onSele
           <button
             key={device.id}
             onClick={() => onSelectDevice(device.device_id)}
+            className="row-interactive"
+            data-selected={isSelected}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -44,11 +63,9 @@ export function DevicesPanel({ devices, alertsByDevice, selectedDeviceId, onSele
               width: '100%',
               textAlign: 'left',
               padding: '12px 18px',
-              background: isSelected ? 'var(--amber-glow)' : 'transparent',
               border: 'none',
               borderTop: i === 0 ? 'none' : '1px solid var(--border-hairline)',
               borderLeft: isSelected ? '2px solid var(--amber)' : '2px solid transparent',
-              cursor: 'pointer',
               gap: 12,
             }}
           >
@@ -61,19 +78,20 @@ export function DevicesPanel({ devices, alertsByDevice, selectedDeviceId, onSele
               </span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0 }}>
-              {openAlerts.length > 0 && (
+              {openAlerts.length > 0 && badge && (
                 <span
                   className="mono"
                   style={{
                     fontSize: 10.5,
-                    color: 'var(--sev-critical)',
-                    border: '1px solid var(--sev-critical)66',
-                    background: 'var(--sev-critical-glow)',
+                    color: badge.color,
+                    border: `1px solid ${badge.color}66`,
+                    background: badge.glow,
                     padding: '2px 7px',
                     borderRadius: 'var(--radius-sm)',
+                    whiteSpace: 'nowrap',
                   }}
                 >
-                  {openAlerts.length} open
+                  {openAlerts.length} open · {worstSeverity.toUpperCase()}
                 </span>
               )}
               <DeviceStatusDot status={device.status} lastSeenStale={stale} />

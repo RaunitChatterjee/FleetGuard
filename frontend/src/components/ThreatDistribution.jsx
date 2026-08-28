@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, Cell, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { EmptyView } from './StateViews';
 
 const ATTACK_LABELS = {
@@ -20,6 +20,22 @@ const SEVERITY_COLOR = {
 function resolveVar(cssVar) {
   if (typeof window === 'undefined') return '#f5a623';
   return getComputedStyle(document.documentElement).getPropertyValue(cssVar.replace('var(', '').replace(')', '')).trim() || '#f5a623';
+}
+
+function BarCountLabel({ x, y, width, height, value }) {
+  return (
+    <text
+      x={x + width + 6}
+      y={y + height / 2}
+      dy={4}
+      fontFamily="var(--font-mono)"
+      fontSize={11.5}
+      fontWeight={600}
+      fill={resolveVar('var(--text-primary)')}
+    >
+      {value}
+    </text>
+  );
 }
 
 export function ThreatDistribution({ alerts }) {
@@ -51,7 +67,7 @@ export function ThreatDistribution({ alerts }) {
   return (
     <div style={{ width: '100%', height: 220 }}>
       <ResponsiveContainer>
-        <BarChart data={data} layout="vertical" margin={{ top: 4, right: 20, bottom: 4, left: 4 }}>
+        <BarChart data={data} layout="vertical" margin={{ top: 4, right: 32, bottom: 4, left: 4 }}>
           <XAxis type="number" hide />
           <YAxis
             type="category"
@@ -73,6 +89,11 @@ export function ThreatDistribution({ alerts }) {
             labelStyle={{ color: resolveVar('var(--text-primary)') }}
           />
           <Bar dataKey="total" radius={[0, 2, 2, 0]} barSize={16}>
+            <LabelList
+              dataKey="total"
+              position="right"
+              content={(props) => <BarCountLabel {...props} />}
+            />
             {data.map((entry) => (
               <Cell key={entry.name} fill={resolveVar(SEVERITY_COLOR[entry.dominant])} />
             ))}
