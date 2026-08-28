@@ -1,4 +1,5 @@
 from fastapi import Depends, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from .database import Base, engine, get_db
@@ -16,6 +17,17 @@ app = FastAPI(
     title="FleetGuard API",
     description="IoT Fleet Telematics Security Platform",
     version="1.0.0"
+)
+
+# CORS: required so the browser-based dashboard (served from a different
+# origin/port, e.g. the Vite dev server on :5173) can call this API.
+# The detection/backend logic below is untouched.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 

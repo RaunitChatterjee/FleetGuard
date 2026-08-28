@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  /* ---- Surface: graphite/charcoal, never blue ---- */
+  --bg-void: #0a0b0d;
+  --bg-base: #101216;
+  --bg-surface: #16181d;
+  --bg-surface-raised: #1c1f25;
+  --bg-surface-hover: #22262d;
+  --border-hairline: #2a2e35;
+  --border-strong: #3a3f48;
+
+  /* ---- Text ---- */
+  --text-primary: #edeef0;
+  --text-secondary: #9aa0aa;
+  --text-tertiary: #61666f;
+  --text-disabled: #43474e;
+
+  /* ---- Signal: amber/orange primary, ember secondary ---- */
+  --amber: #f5a623;
+  --amber-dim: #b97d1f;
+  --amber-glow: rgba(245, 166, 35, 0.16);
+  --ember: #ff6a3d;
+  --ember-glow: rgba(255, 106, 61, 0.18);
+
+  /* ---- Severity scale: red reserved for critical only ---- */
+  --sev-critical: #e5484d;
+  --sev-critical-glow: rgba(229, 72, 77, 0.16);
+  --sev-high: #f5a623;
+  --sev-high-glow: rgba(245, 166, 35, 0.14);
+  --sev-medium: #c9a227;
+  --sev-medium-glow: rgba(201, 162, 39, 0.12);
+  --sev-low: #7c828d;
+  --sev-low-glow: rgba(124, 130, 141, 0.12);
+
+  /* ---- Status: muted, neutral (not go/stop green-red cliche) ---- */
+  --status-normal: #6b9080;
+  --status-warning: #c9a227;
+  --status-offline: #4a4f58;
+
+  /* ---- Type ---- */
+  --font-display: 'Chakra Petch', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* ---- Shape: chamfered, not rounded — instrument-panel language ---- */
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --chamfer: 10px;
+
+  /* ---- Motion ---- */
+  --ease-console: cubic-bezier(0.22, 1, 0.36, 1);
+}
